@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Para kay Mama at Papa</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* CSS Reset & Setup */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body, html {
-            height: 100%; width: 100%; margin: 0; padding: 0;
-            overflow: hidden; background-color: #7D2AE8;
+            height: 100%; width: 100%; overflow: hidden;
+            background-color: #7D2AE8;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
         }
 
+        /* Background Gradient */
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -26,6 +29,7 @@
             top: 0; left: 0; display: flex; flex-direction: column;
         }
 
+        /* Glass Effect */
         .glass {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
@@ -34,7 +38,19 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* Envelope UI */
+        /* --- MAIN UI STYLES --- */
+        #main-ui {
+            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+            height: 100%; width: 100%; padding: 2rem;
+            transition: all 1s ease;
+        }
+        .header-section { text-align: center; margin-top: 2.5rem; }
+        .title-text { font-size: 3rem; font-weight: 900; margin-bottom: 2.5rem; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .names-row { display: flex; gap: 1rem; justify-content: center; }
+        .name-box { padding: 1rem 2rem; border-radius: 1.5rem; font-size: 1.5rem; font-weight: bold; }
+        .footer-text { text-align: center; color: rgba(255,255,255,0.7); font-size: 10px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.3em; margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+        /* Envelope */
         .envelope-wrapper {
             position: relative; width: 260px; height: 160px;
             background: white; border-radius: 4px;
@@ -47,9 +63,16 @@
             background: #f3f4f6; clip-path: polygon(0 0, 100% 0, 50% 50%);
             transition: transform 0.8s ease-in-out; transform-origin: top; z-index: 10;
         }
+        .envelope-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+        .open-btn {
+            background-color: #7D2AE8; color: white; padding: 0.5rem 1.5rem; border-radius: 9999px;
+            font-weight: 900; font-size: 0.75rem; box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+            text-transform: uppercase; letter-spacing: 0.1em; z-index: 20;
+        }
+        
         .opened { transform: scale(35) !important; opacity: 0; pointer-events: none; }
         .opened .flap { transform: rotateX(180deg); }
-        .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; transition: all 0.8s ease; }
+        .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; }
 
         /* Progress & Typing */
         .progress-container {
@@ -57,18 +80,22 @@
             background: rgba(255,255,255,0.2); border-radius: 10px; z-index: 100;
             opacity: 0; transition: opacity 1s ease;
         }
-        .progress-bar { height: 100%; width: 0%; background: white; box-shadow: 0 0 10px white; transition: width 0.5s ease; }
+        .progress-bar { height: 100%; width: 0%; background: white; box-shadow: 0 0 10px white; transition: width 0.5s ease; border-radius: 10px; }
         .letter-screen {
             position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-            padding: 24px; opacity: 0; pointer-events: none; transition: opacity 1s ease; z-index: 90;
+            padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 1s ease; z-index: 90;
         }
-        #typing-container { width: 100%; max-height: 65vh; overflow-y: auto; text-align: center; font-weight: 800; line-height: 1.4; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.3); scrollbar-width: none; }
+        .letter-box { width: 100%; max-width: 24rem; padding: 2rem; border-radius: 2.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; }
+        #typing-container { width: 100%; max-height: 65vh; overflow-y: auto; text-align: center; font-weight: 800; line-height: 1.4; text-shadow: 0 2px 10px rgba(0,0,0,0.3); scrollbar-width: none; }
 
-        /* Realistic Cake */
+        /* Cake UI STYLES */
         .cake-container {
             display: none; flex-direction: column; align-items: center; justify-content: center;
             position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
         }
+        .instruction-text { font-weight: 900; font-size: 1.25rem; text-align: center; margin-bottom: 2.5rem; text-shadow: 0 4px 6px rgba(0,0,0,0.3); animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(-25%); } 50% { transform: none; } }
+
         .cake-platform { position: relative; width: 250px; height: 250px; display: flex; justify-content: center; align-items: flex-end; cursor: pointer; transition: transform 0.2s; }
         .cake-base { position: relative; width: 200px; height: 130px; background: #4e342e; border-radius: 10px 10px 4px 4px; box-shadow: inset 0 -10px 0 rgba(0,0,0,0.3); border-bottom: 6px solid #2b1d1a; }
         .cake-layer { position: absolute; top: 55px; width: 100%; height: 18px; background: #3e2723; }
@@ -80,15 +107,22 @@
         .flame { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 20px; height: 32px; background: radial-gradient(circle, #ffeb3b 20%, #ff9800 60%, #f44336 100%); border-radius: 50% 50% 20% 20%; box-shadow: 0 0 15px #ff9800, 0 0 30px #ff5722; animation: flicker 0.1s infinite alternate; }
         .flame.blown { display: none; }
 
-        @keyframes flicker {
-            0% { transform: translateX(-50%) scale(1) rotate(-2deg); }
-            100% { transform: translateX(-50%) scale(1.15) rotate(2deg); }
-        }
+        .cake-greeting { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-shadow: 0 2px 4px rgba(0,0,0,0.3); padding-top: 1.5rem; }
+        .greeting-small { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.9; }
+        .greeting-large { font-size: 1.5rem; font-weight: 900; line-height: 1; text-transform: uppercase; }
 
+        @keyframes flicker { 0% { transform: translateX(-50%) scale(1) rotate(-2deg); } 100% { transform: translateX(-50%) scale(1.15) rotate(2deg); } }
         .pulse { animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        
-        .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* Final Message */
+        #final-msg { text-align: center; margin-top: 3rem; padding: 0 2.5rem; display: none; }
+        #final-msg.show { display: block; animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .yay-text { font-size: 3rem; font-weight: 900; margin-bottom: 0.5rem; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .yay-subtext { font-size: 1.25rem; font-weight: bold; font-style: italic; }
+        .restart-btn { margin-top: 2rem; background: white; color: #7D2AE8; padding: 0.75rem 2.5rem; border-radius: 9999px; font-weight: 900; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; cursor: pointer; }
+        .restart-btn:active { transform: scale(0.95); }
+
         @keyframes scaleIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
@@ -107,23 +141,23 @@
     <audio id="v5" preload="auto"><source src="voice 5.m4a" type="audio/mp4"></audio>
     <audio id="v6" preload="auto"><source src="voice 6.m4a" type="audio/mp4"></audio>
 
-    <div id="main-ui" class="flex flex-col justify-between items-center h-full w-full p-8 transition-all duration-1000">
-        <div class="text-center mt-10">
-            <h1 class="text-white text-5xl font-black mb-10 drop-shadow-lg">Para kay</h1>
-            <div class="flex gap-4 justify-center">
-                <div class="glass px-8 py-4 rounded-3xl text-2xl font-bold text-white">Mama</div>
-                <div class="glass px-8 py-4 rounded-3xl text-2xl font-bold text-white">Papa</div>
+    <div id="main-ui">
+        <div class="header-section">
+            <h1 class="title-text">Para kay</h1>
+            <div class="names-row">
+                <div class="glass name-box">Mama</div>
+                <div class="glass name-box">Papa</div>
             </div>
         </div>
 
         <div id="envelope-trigger" class="envelope-wrapper">
             <div class="flap"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div class="bg-[#7D2AE8] text-white px-6 py-2 rounded-full font-black text-xs shadow-lg pulse z-20 uppercase tracking-widest">Pindutin ang Sobre ✨</div>
+            <div class="envelope-center">
+                <div class="pulse open-btn">Pindutin ang Sobre ✨</div>
             </div>
         </div>
 
-        <div class="text-center text-white/60 text-[10px] uppercase font-bold tracking-[0.3em] mb-4 drop-shadow-sm">Isang surpresa mula sa inyong mga anak</div>
+        <div class="footer-text">Isang surpresa mula sa inyong mga anak</div>
     </div>
 
     <div id="progress-container" class="progress-container">
@@ -131,14 +165,14 @@
     </div>
 
     <div id="letter-screen" class="letter-screen">
-        <div class="glass p-8 rounded-[2.5rem] w-full max-w-sm flex flex-col items-center justify-center min-h-[300px]">
+        <div class="glass letter-box">
             <div id="typing-container"></div>
         </div>
     </div>
 
     <!-- Realistic Cake UI -->
     <div id="cake-ui" class="cake-container">
-        <div id="instruction" class="text-white font-black text-xl text-center mb-10 animate-bounce drop-shadow-md">
+        <div id="instruction" class="instruction-text">
             🎂 PINDUTIN ANG CAKE NG 3 BESES<br>PARA MAHIPAN ANG KANDILA!
         </div>
 
@@ -154,17 +188,17 @@
                     <div class="drip" style="height: 28px;"></div>
                     <div class="drip" style="height: 32px;"></div>
                 </div>
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-white drop-shadow-md pt-6">
-                    <div class="text-[11px] font-black uppercase tracking-widest opacity-90">Happy Birthday &</div>
-                    <div class="text-2xl font-black leading-none uppercase">Anniversary!</div>
+                <div class="cake-greeting">
+                    <div class="greeting-small">Happy Birthday &</div>
+                    <div class="greeting-large">Anniversary!</div>
                 </div>
             </div>
         </div>
 
-        <div id="final-msg" class="hidden text-center mt-12 px-10 scale-in">
-            <h2 class="text-white text-5xl font-black mb-2 drop-shadow-lg">YAY! 🎊</h2>
-            <p class="text-white text-xl font-bold italic">Mahal na mahal namin kayo!</p>
-            <button onclick="location.reload()" class="mt-8 bg-white text-[#7D2AE8] px-10 py-3 rounded-full font-black shadow-2xl active:scale-95 transition-transform uppercase text-xs tracking-widest">Ulitin Surpresa</button>
+        <div id="final-msg">
+            <h2 class="yay-text">YAY! 🎊</h2>
+            <p class="yay-subtext">Mahal na mahal namin kayo!</p>
+            <button onclick="location.reload()" class="restart-btn">Ulitin Surpresa</button>
         </div>
     </div>
 
@@ -203,10 +237,9 @@
             trigger.classList.add('opened');
             mainUI.classList.add('fade-out');
 
-            // BG Music starts at 25s with initial low volume
             bgMusic.currentTime = 25; 
             bgMusic.volume = 0.15;
-            bgMusic.play().catch(e => console.log("Audio waiting for user..."));
+            bgMusic.play().catch(e => console.log("Audio waiting..."));
 
             setTimeout(() => {
                 progressContainer.style.opacity = '1';
@@ -229,8 +262,6 @@
                 return;
             }
             
-            // LAKASAN ANG BG MUSIC HABANG LUMALABAS ANG LETTER
-            // 0.35 volume is noticeably louder but shouldn't drown the voice
             if (currentStep === 0) {
                 bgMusic.volume = 0.35;
             }
@@ -276,8 +307,7 @@
                 if (taps === 3) {
                     flame.classList.add('blown');
                     instruction.style.display = 'none';
-                    finalMsg.classList.remove('hidden');
-                    // Full volume for the end celebration
+                    finalMsg.classList.add('show');
                     bgMusic.volume = 0.5; 
                 }
             }
