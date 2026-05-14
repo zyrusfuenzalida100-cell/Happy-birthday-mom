@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para kay Mama at Papa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            height: 100%; width: 100%; margin: 0; padding: 0;
+            overflow: hidden; background-color: #7D2AE8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animated-bg {
+            background: linear-gradient(-45deg, #00C4CC, #7D2AE8, #FF66C4, #FFDE59);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            height: 100%; width: 100%; position: fixed;
+            top: 0; left: 0; display: flex; flex-direction: column;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Envelope UI */
+        .envelope-wrapper {
+            position: relative; width: 260px; height: 160px;
+            background: white; border-radius: 4px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            transition: all 1.5s cubic-bezier(0.7, 0, 0.3, 1);
+            transform-origin: center; cursor: pointer;
+        }
+        .flap {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #f3f4f6; clip-path: polygon(0 0, 100% 0, 50% 50%);
+            transition: transform 0.8s ease-in-out; transform-origin: top; z-index: 10;
+        }
+        .opened { transform: scale(35) !important; opacity: 0; pointer-events: none; }
+        .opened .flap { transform: rotateX(180deg); }
+        .fade-out { opacity: 0; transform: scale(0.9); pointer-events: none; transition: all 0.8s ease; }
+
+        /* Progress & Typing */
+        .progress-container {
+            position: fixed; top: 40px; left: 10%; width: 80%; height: 4px;
+            background: rgba(255,255,255,0.2); border-radius: 10px; z-index: 100;
+            opacity: 0; transition: opacity 1s ease;
+        }
+        .progress-bar { height: 100%; width: 0%; background: white; box-shadow: 0 0 10px white; transition: width 0.5s ease; }
+        .letter-screen {
+            position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+            padding: 24px; opacity: 0; pointer-events: none; transition: opacity 1s ease; z-index: 90;
+        }
+        #typing-container { width: 100%; max-height: 65vh; overflow-y: auto; text-align: center; font-weight: 800; line-height: 1.4; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.3); scrollbar-width: none; }
+
+        /* Realistic Cake */
+        .cake-container {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+        }
+        .cake-platform { position: relative; width: 250px; height: 250px; display: flex; justify-content: center; align-items: flex-end; cursor: pointer; transition: transform 0.2s; }
+        .cake-base { position: relative; width: 200px; height: 130px; background: #4e342e; border-radius: 10px 10px 4px 4px; box-shadow: inset 0 -10px 0 rgba(0,0,0,0.3); border-bottom: 6px solid #2b1d1a; }
+        .cake-layer { position: absolute; top: 55px; width: 100%; height: 18px; background: #3e2723; }
+        .icing-top { position: absolute; top: -12px; width: 216px; left: -8px; height: 50px; background: #ffc2d1; border-radius: 20px 20px 10px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .icing-drip { position: absolute; top: 28px; display: flex; width: 100%; justify-content: space-around; padding: 0 5px; }
+        .drip { width: 16px; background: #ffc2d1; border-radius: 0 0 10px 10px; }
+        
+        .candle { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 15px; height: 50px; background: repeating-linear-gradient(45deg, #fff, #fff 6px, #ff4d6d 6px, #ff4d6d 12px); border-radius: 5px; z-index: 5; border: 1px solid rgba(0,0,0,0.1); }
+        .flame { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 20px; height: 32px; background: radial-gradient(circle, #ffeb3b 20%, #ff9800 60%, #f44336 100%); border-radius: 50% 50% 20% 20%; box-shadow: 0 0 15px #ff9800, 0 0 30px #ff5722; animation: flicker 0.1s infinite alternate; }
+        .flame.blown { display: none; }
+
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1) rotate(-2deg); }
+            100% { transform: translateX(-50%) scale(1.15) rotate(2deg); }
+        }
+
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        
+        .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes scaleIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body class="animated-bg">
+
+    <!-- MP3 Background Music -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="background-sad-song.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Voice Overs -->
+    <audio id="v1" preload="auto"><source src="voice 1 part 1.m4a" type="audio/mp4"></audio>
+    <audio id="v2" preload="auto"><source src="voice 2.m4a" type="audio/mp4"></audio>
+    <audio id="v3" preload="auto"><source src="voice 3.m4a" type="audio/mp4"></audio>
+    <audio id="v4" preload="auto"><source src="voice 4.m4a" type="audio/mp4"></audio>
+    <audio id="v5" preload="auto"><source src="voice 5.m4a" type="audio/mp4"></audio>
+    <audio id="v6" preload="auto"><source src="voice 6.m4a" type="audio/mp4"></audio>
+
+    <div id="main-ui" class="flex flex-col justify-between items-center h-full w-full p-8 transition-all duration-1000">
+        <div class="text-center mt-10">
+            <h1 class="text-white text-5xl font-black mb-10 drop-shadow-lg">Para kay</h1>
+            <div class="flex gap-4 justify-center">
+                <div class="glass px-8 py-4 rounded-3xl text-2xl font-bold text-white">Mama</div>
+                <div class="glass px-8 py-4 rounded-3xl text-2xl font-bold text-white">Papa</div>
+            </div>
+        </div>
+
+        <div id="envelope-trigger" class="envelope-wrapper">
+            <div class="flap"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="bg-[#7D2AE8] text-white px-6 py-2 rounded-full font-black text-xs shadow-lg pulse z-20 uppercase tracking-widest">Pindutin ang Sobre ✨</div>
+            </div>
+        </div>
+
+        <div class="text-center text-white/60 text-[10px] uppercase font-bold tracking-[0.3em] mb-4 drop-shadow-sm">Isang surpresa mula sa inyong mga anak</div>
+    </div>
+
+    <div id="progress-container" class="progress-container">
+        <div id="bar" class="progress-bar"></div>
+    </div>
+
+    <div id="letter-screen" class="letter-screen">
+        <div class="glass p-8 rounded-[2.5rem] w-full max-w-sm flex flex-col items-center justify-center min-h-[300px]">
+            <div id="typing-container"></div>
+        </div>
+    </div>
+
+    <!-- Realistic Cake UI -->
+    <div id="cake-ui" class="cake-container">
+        <div id="instruction" class="text-white font-black text-xl text-center mb-10 animate-bounce drop-shadow-md">
+            🎂 PINDUTIN ANG CAKE NG 3 BESES<br>PARA MAHIPAN ANG KANDILA!
+        </div>
+
+        <div class="cake-platform" onclick="handleCakeClick()">
+            <div class="candle"><div id="flame" class="flame"></div></div>
+            <div class="cake-base">
+                <div class="cake-layer"></div>
+                <div class="icing-top"></div>
+                <div class="icing-drip">
+                    <div class="drip" style="height: 38px;"></div>
+                    <div class="drip" style="height: 22px;"></div>
+                    <div class="drip" style="height: 45px;"></div>
+                    <div class="drip" style="height: 28px;"></div>
+                    <div class="drip" style="height: 32px;"></div>
+                </div>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-white drop-shadow-md pt-6">
+                    <div class="text-[11px] font-black uppercase tracking-widest opacity-90">Happy Birthday &</div>
+                    <div class="text-2xl font-black leading-none uppercase">Anniversary!</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="final-msg" class="hidden text-center mt-12 px-10 scale-in">
+            <h2 class="text-white text-5xl font-black mb-2 drop-shadow-lg">YAY! 🎊</h2>
+            <p class="text-white text-xl font-bold italic">Mahal na mahal namin kayo!</p>
+            <button onclick="location.reload()" class="mt-8 bg-white text-[#7D2AE8] px-10 py-3 rounded-full font-black shadow-2xl active:scale-95 transition-transform uppercase text-xs tracking-widest">Ulitin Surpresa</button>
+        </div>
+    </div>
+
+    <script>
+        const trigger = document.getElementById('envelope-trigger');
+        const mainUI = document.getElementById('main-ui');
+        const letterScreen = document.getElementById('letter-screen');
+        const typingContainer = document.getElementById('typing-container');
+        const progressBar = document.getElementById('bar');
+        const progressContainer = document.getElementById('progress-container');
+        const cakeUI = document.getElementById('cake-ui');
+        const flame = document.getElementById('flame');
+        const instruction = document.getElementById('instruction');
+        const finalMsg = document.getElementById('final-msg');
+        const bgMusic = document.getElementById('bgMusic');
+
+        const audios = [
+            document.getElementById('v1'), document.getElementById('v2'),
+            document.getElementById('v3'), document.getElementById('v4'),
+            document.getElementById('v5'), document.getElementById('v6')
+        ];
+
+        const messages = [
+            "Happy Birthday at Happy wedding anniversary po mama and papa!",
+            "Maraming Maraming salamat po sa inyong pag-aalaga, pagmamahal, at walang sawang suporta nyo po sa amin. Pasensya na po Ma kung hindi po kami agad bumati ng Happy Mother’s Day.",
+            "Sana lagi po kayong healthy upang tayo po ay maligaya kahit na tayo lang po ay mahirap. Kahit ang sulat na ito ay simple lamang, puno ng pagmamahal ang aming nais iparating mula sa inyo po. Mahal na mahal ka namin, Mama at Papa!",
+            "Pangako po namin na gagawin po namin ang aming makakaya upang maging masaya ang ating pamilyang puno ng pagmamahal. Pasyensya na din po kayo Ma kung hindi po kami minsan sumusunod sa inyo po. Naway mapatawad nyo po sana kami.",
+            "God bless us all!",
+            "Mula sa anak nyo pong pogi at maganda syempre,\n\nZyrus pogi and Zyra pretty"
+        ];
+
+        let currentStep = 0;
+        let taps = 0;
+
+        trigger.addEventListener('click', () => {
+            trigger.classList.add('opened');
+            mainUI.classList.add('fade-out');
+
+            // BG Music starts at 25s with initial low volume
+            bgMusic.currentTime = 25; 
+            bgMusic.volume = 0.15;
+            bgMusic.play().catch(e => console.log("Audio waiting for user..."));
+
+            setTimeout(() => {
+                progressContainer.style.opacity = '1';
+                letterScreen.style.opacity = '1';
+                mainUI.style.display = 'none';
+                startStory();
+            }, 1200);
+        });
+
+        async function startStory() {
+            if (currentStep >= messages.length) {
+                setTimeout(() => {
+                    letterScreen.style.opacity = '0';
+                    progressContainer.style.opacity = '0';
+                    setTimeout(() => {
+                        letterScreen.style.display = 'none';
+                        cakeUI.style.display = 'flex';
+                    }, 1000);
+                }, 2000);
+                return;
+            }
+            
+            // LAKASAN ANG BG MUSIC HABANG LUMALABAS ANG LETTER
+            // 0.35 volume is noticeably louder but shouldn't drown the voice
+            if (currentStep === 0) {
+                bgMusic.volume = 0.35;
+            }
+
+            const msg = messages[currentStep];
+            const audio = audios[currentStep];
+            typingContainer.innerHTML = "";
+            typingContainer.style.fontSize = msg.length > 120 ? "1.1rem" : "1.45rem";
+            
+            try { await audio.play(); } catch(e) {}
+            
+            let dur = audio.duration || Math.max(5, msg.length / 14);
+            await typeMessage(msg, dur);
+            
+            progressBar.style.width = `${((currentStep + 1) / messages.length) * 100}%`;
+            setTimeout(() => { currentStep++; startStory(); }, 1500);
+        }
+
+        function typeMessage(text, dur) {
+            return new Promise(resolve => {
+                let i = 0;
+                const delay = (dur * 960) / text.length;
+                function type() {
+                    if (i < text.length) {
+                        typingContainer.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
+                        i++; setTimeout(type, delay);
+                    } else resolve();
+                }
+                type();
+            });
+        }
+
+        function handleCakeClick() {
+            if (taps < 3) {
+                taps++;
+                const cakeNode = document.querySelector('.cake-platform');
+                cakeNode.style.transform = 'scale(0.92)';
+                setTimeout(() => cakeNode.style.transform = 'scale(1)', 100);
+                
+                if (taps === 1) instruction.innerHTML = "🕯️ MUNTI NA! <br>PINDUTIN PA ISA!";
+                if (taps === 2) instruction.innerHTML = "🔥 ISA NA LANG! <br>HIPAN NA PO!";
+                
+                if (taps === 3) {
+                    flame.classList.add('blown');
+                    instruction.style.display = 'none';
+                    finalMsg.classList.remove('hidden');
+                    // Full volume for the end celebration
+                    bgMusic.volume = 0.5; 
+                }
+            }
+        }
+    </script>
+</body>
+</html>
